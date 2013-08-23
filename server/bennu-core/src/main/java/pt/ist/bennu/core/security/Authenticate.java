@@ -41,7 +41,7 @@ public class Authenticate {
 
     private static final String USER_SESSION_ATTRIBUTE = "USER_SESSION_ATTRIBUTE";
 
-    private static final ThreadLocal<UserSession> wrapper = new ThreadLocal<>();
+    private static final InheritableThreadLocal<UserSession> wrapper = new InheritableThreadLocal<>();
 
     private static Set<AuthenticationListener> authenticationListeners;
 
@@ -93,7 +93,7 @@ public class Authenticate {
             session.removeAttribute(USER_SESSION_ATTRIBUTE);
             session.invalidate();
         }
-        setUser(null);
+        setUser((UserSession)null);
     }
 
     @Atomic
@@ -111,6 +111,10 @@ public class Authenticate {
 
     public static void setUser(UserSession user) {
         wrapper.set(user);
+    }
+    
+    public static void setUser(User user){
+        setUser(new UserSession(user));
     }
 
     public static boolean hasUser() {

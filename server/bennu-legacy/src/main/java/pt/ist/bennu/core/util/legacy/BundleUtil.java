@@ -28,10 +28,13 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pt.ist.bennu.core.domain.VirtualHost;
+import pt.ist.dsi.commons.i18n.LocalizedString;
+import pt.ist.dsi.commons.i18n.LocalizedString.Builder;
 import pt.utl.ist.fenix.tools.util.i18n.Language;
 import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 
@@ -89,4 +92,23 @@ public class BundleUtil {
 //        }
 //        return someClass.getName();
 //    }
+
+    public static LocalizedString getLocalizedString(MultiLanguageString mls) {
+        final Builder builder = new LocalizedString.Builder();
+        for (Language language : mls.getAllLanguages()) {
+            final String content = mls.getContent(language);
+            builder.with(Locale.forLanguageTag(language.toString()), content);
+        }
+        return builder.build();
+    }
+
+    public static String getLocalizedNamedFroClass(Class<?> someClass) {
+        ClassNameBundle annotation = someClass.getAnnotation(ClassNameBundle.class);
+        if (annotation != null) {
+            String key = annotation.key();
+            return BundleUtil.getFormattedStringFromResourceBundle(annotation.bundle(),
+                    !StringUtils.isEmpty(key) ? key : "label." + someClass.getName());
+        }
+        return someClass.getName();
+    }
 }
